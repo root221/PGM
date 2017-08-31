@@ -30,10 +30,26 @@ function [i, j] = GetNextCliques(P, messages)
 i = 0;
 j = 0;
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% YOUR CODE HERE
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+N = length(P.cliqueList)
 
+for i = 1:N
+	edges = find(P.edges(i,:))
+	for j = 1:N
+		if(isempty(messages(i,j).var) && P.edges(i,j))
+			
+			idx = setdiff(edges,j)	
+			for k = 1:length(idx)
+				if(isempty(messages(idx(k),i).var))
+					break
+				end	
+				if (k == length(idx))
+					return 
+				end		
+			end
 
+			
+		end	
+	end
+end
 
 return;
