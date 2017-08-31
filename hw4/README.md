@@ -7,8 +7,8 @@ val  =  0.010000   0.180000   0.810000
 var  =  2 1 3  
 card =  3 3 3  
 - InitPotential.INPUT.factorList(3)  
-var  =  3
-card =  3
+var  =  3  
+card =  3  
 - InitPotential.INPUT.factorList(4)  
 var  =  4 1 3    
 card =  3 3 3         
