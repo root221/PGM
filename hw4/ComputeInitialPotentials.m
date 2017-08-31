@@ -40,27 +40,31 @@ P.edges = zeros(N);
 %
 P.edges = C.edges
 
+for i = 1:N
+    P.cliqueList(i).var = C.nodes{i};
+    P.cliqueList(i).card = ones(1,length(P.cliqueList(i).var))
+end
+
+
+assignment = zeros(1,length(C.factorList))
+for i = 1:length(C.factorList)
+    for j = 1:N
+        % check whether C.factorList(i).var is a subset of P.cliqueList.var(j)
+        [TF,S_IDX] = ismember(C.factorList(i).var,P.cliqueList(j).var) 
+        if(all(TF))
+            assignment(i) = j
+            break
+        end
+    end
+end
 
 for i = 1:N
-	P.cliqueList(i).var = C.nodes{i};
+    P.cliqueList(i).val = ones(1,prod(P.cliqueList(i).card))
 end
 
-for i = 1:length(C.factorList)
-	for j = 1:N
-		% check whether C.factorList(i).var is a subset of P.cliqueList.var(j)
-		if(all(ismember(C.factorList(i).var,P.cliqueList(j).var)))
-			if(isempty(P.cliqueList(j).val))
-				P.cliqueList(j) = C.factorList(i)
-			else
-				P.cliqueList(j) = FactorProduct(P.cliqueList(j),C.factorList(i))
-			end
-			disp(P.cliqueList(j))
-		end
-	end
+for i = 1:length(assignment)
+     P.cliqueList(assignment(i)) = FactorProduct(P.cliqueList(assignment(i)),C.factorList(i))
 end
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
