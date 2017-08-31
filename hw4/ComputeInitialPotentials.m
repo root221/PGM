@@ -18,7 +18,7 @@
 % Copyright (C) Daphne Koller, Stanford University, 2012
 
 
-function P = ComputeInitialPotentials(C)
+function [P,assignment] = ComputeInitialPotentials(C)
 
 % number of cliques
 N = length(C.nodes);
@@ -42,17 +42,24 @@ P.edges = C.edges
 
 for i = 1:N
     P.cliqueList(i).var = C.nodes{i};
-    P.cliqueList(i).card = ones(1,length(P.cliqueList(i).var))
+    P.cliqueList(i).card = zeros(1,length(P.cliqueList(i).var))
 end
 
 
 assignment = zeros(1,length(C.factorList))
-for i = 1:length(C.factorList)
-    for j = 1:N
+for j = 1:N
+    for i = 1:length(C.factorList)
         % check whether C.factorList(i).var is a subset of P.cliqueList.var(j)
         [TF,S_IDX] = ismember(C.factorList(i).var,P.cliqueList(j).var) 
+        for k = 1:length(S_IDX)
+            if(TF(k))
+                P.cliqueList(j).card(S_IDX(k)) = C.factorList(i).card(k)
+            end
+        end
         if(all(TF))
             assignment(i) = j
+        end
+        if(length(find(P.cliqueList(j).card)) == length(P.cliqueList(j).card))
             break
         end
     end
