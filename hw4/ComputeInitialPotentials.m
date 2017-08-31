@@ -18,7 +18,7 @@
 % Copyright (C) Daphne Koller, Stanford University, 2012
 
 
-function [P,assignment] = ComputeInitialPotentials(C)
+function P = ComputeInitialPotentials(C)
 
 % number of cliques
 N = length(C.nodes);
@@ -56,12 +56,11 @@ for j = 1:N
                 P.cliqueList(j).card(S_IDX(k)) = C.factorList(i).card(k)
             end
         end
-        if(all(TF))
+        % is already assign skip
+        if(all(TF) && assignment(i) == 0)
             assignment(i) = j
         end
-        if(length(find(P.cliqueList(j).card)) == length(P.cliqueList(j).card))
-            break
-        end
+        
     end
 end
 
