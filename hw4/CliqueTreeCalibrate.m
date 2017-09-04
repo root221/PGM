@@ -36,27 +36,42 @@ MESSAGES = repmat(struct('var', [], 'card', [], 'val', []), N, N);
 % Remember that you only need an upward pass and a downward pass.
 %
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+if(isMax)
+  for i = 1:length(P.cliqueList)
+    P.cliqueList(i).val =  log(P.cliqueList(i).val)
+  end
+end
 [i,j] = GetNextCliques(P,MESSAGES)
 while(i!=0 && j!=0)
   message = P.cliqueList(i)
-  % log-transform
-  if(isMax)
-    message = log(message)
-  end
   for k = 1:N
     if (k==j)
       continue
     end
     if(MESSAGES(k,i).var)
-      message = FactorProduct(message,MESSAGES(k,i))
+      if(isMax)
+        message = FactorSum(message,MESSAGES(k,i))
+      else
+        message = FactorProduct(message,MESSAGES(k,i))
+      end
+
     end
   end
   tmp = setdiff(P.cliqueList(i).var,P.cliqueList(j).var)
   v = setdiff(P.cliqueList(i).var,tmp)
-  message = ComputeMarginal(v,message,[])
+  disp('Text');
+  disp(message);
+  disp('Text');
+  disp(tmp);
+  if(isMax)
+    message = FactorMaxMarginalization(message,tmp)
+  else
+    message = ComputeMarginal(v,message,[])
+  end
   MESSAGES(i,j) = message
-  MESSAGES(i, j).val = MESSAGES(i, j).val ./ sum(MESSAGES(i, j).val);
+  if(~isMax)
+    MESSAGES(i, j).val = MESSAGES(i, j).val ./ sum(MESSAGES(i, j).val);
+  end
   [i,j] = GetNextCliques(P,MESSAGES)
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -68,7 +83,11 @@ end
 for i = 1:N
   for k = 1:N
     if(P.edges(k,i))
-      P.cliqueList(i) = FactorProduct(P.cliqueList(i),MESSAGES(k,i))
+      if(isMax)
+        P.cliqueList(i) = FactorSum(P.cliqueList(i),MESSAGES(k,i))
+      else
+        P.cliqueList(i) = FactorProduct(P.cliqueList(i),MESSAGES(k,i))
+      end
     end
   end 
 
