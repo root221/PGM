@@ -37,7 +37,10 @@ for i = 1:N
 	for j = 1:N
 		if(isempty(messages(i,j).var) && P.edges(i,j))
 			
-			idx = setdiff(edges,j)	
+			idx = setdiff(edges,j)
+			if (isempty(idx))
+				return
+			end	
 			for k = 1:length(idx)
 				if(isempty(messages(idx(k),i).var))
 					break
@@ -51,5 +54,6 @@ for i = 1:N
 		end	
 	end
 end
-
+i = 0
+j = 0
 return;

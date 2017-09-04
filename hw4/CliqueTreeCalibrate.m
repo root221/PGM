@@ -9,7 +9,7 @@
 %
 % Copyright (C) Daphne Koller, Stanford University, 2012
 
-function P = CliqueTreeCalibrate(P, isMax)
+function [P,MESSAGES] = CliqueTreeCalibrate(P, isMax)
 
 
 % Number of cliques in the tree.
@@ -36,15 +36,41 @@ MESSAGES = repmat(struct('var', [], 'card', [], 'val', []), N, N);
 % Remember that you only need an upward pass and a downward pass.
 %
  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-[i,j] = GetNextCliques(P,MESSAGES)
 
+[i,j] = GetNextCliques(P,MESSAGES)
+while(i!=0 && j!=0)
+  message = P.cliqueList(i)
+  % log-transform
+  if(isMax)
+    message = log(message)
+  end
+  for k = 1:N
+    if (k==j)
+      continue
+    end
+    if(MESSAGES(k,i).var)
+      message = FactorProduct(message,MESSAGES(k,i))
+    end
+  end
+  tmp = setdiff(P.cliqueList(i).var,P.cliqueList(j).var)
+  v = setdiff(P.cliqueList(i).var,tmp)
+  message = ComputeMarginal(v,message,[])
+  MESSAGES(i,j) = message
+  MESSAGES(i, j).val = MESSAGES(i, j).val ./ sum(MESSAGES(i, j).val);
+  [i,j] = GetNextCliques(P,MESSAGES)
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % YOUR CODE HERE
 %
 % Now the clique tree has been calibrated. 
 % Compute the final potentials for the cliques and place them in P.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+for i = 1:N
+  for k = 1:N
+    if(P.edges(k,i))
+      P.cliqueList(i) = FactorProduct(P.cliqueList(i),MESSAGES(k,i))
+    end
+  end 
 
-
-
+end
 return

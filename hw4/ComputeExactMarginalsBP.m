@@ -16,12 +16,23 @@ function M = ComputeExactMarginalsBP(F, E, isMax)
 
 % initialization
 % you should set it to the correct value in your code
-M = [];
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% YOUR CODE HERE
-%
-% Implement Exact and MAP Inference.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+result = [];
+P = CreateCliqueTree(F, E)
+P = CliqueTreeCalibrate(P, 0)
+N = length(P.cliqueList)
+for i = 1:N
+	v = P.cliqueList(i).var
+	for j = 1:length(v)
+		result = [result ComputeMarginal(v(j),P.cliqueList(i),[])]
+	end
+end
 
+maximum = max([result.var])
+M = repmat(struct('var',[],'card',[],'val',[]),maximum,1)
+for i = 1:maximum
+	idx = find([result.var]==i)
+	M(i) = result(idx(1))
+end
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 end
