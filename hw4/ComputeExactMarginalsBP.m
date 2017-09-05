@@ -19,12 +19,20 @@ function M = ComputeExactMarginalsBP(F, E, isMax)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 result = [];
 P = CreateCliqueTree(F, E)
-P = CliqueTreeCalibrate(P, 0)
+if (isMax)
+	P = CliqueTreeCalibrate(P,1)
+else
+	P = CliqueTreeCalibrate(P, 0)
+end
 N = length(P.cliqueList)
 for i = 1:N
 	v = P.cliqueList(i).var
 	for j = 1:length(v)
-		result = [result ComputeMarginal(v(j),P.cliqueList(i),[])]
+		if(isMax)
+			result = [result FactorMaxMarginalization(P.cliqueList(i), v(j))]
+		else
+			result = [result ComputeMarginal(v(j),P.cliqueList(i),[])]
+		end
 	end
 end
 
